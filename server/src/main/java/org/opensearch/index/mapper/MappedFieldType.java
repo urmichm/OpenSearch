@@ -75,8 +75,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-// ISSUE-19884 : Important class
-
 /**
  * This defines the core properties and functions to operate on a field.
  *
