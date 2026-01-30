@@ -163,6 +163,7 @@ public class DocumentMapperParser {
             }
         }
 
+        // ISSUE-19884: Meta on mapping level is presented here
         Map<String, Object> meta = (Map<String, Object>) mapping.remove("_meta");
         if (meta != null) {
             // It may not be required to copy meta here to maintain immutability
