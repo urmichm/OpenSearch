@@ -142,9 +142,16 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals("meta")) {
+            } else if (propName.equals("_meta") || propName.equals("meta")) { // LBL
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
+                if (propName.equals("meta")) {
+                    deprecationLogger.deprecate(
+                        "meta",
+                        "Parameter [meta] on field [{}] is deprecated, use [_meta] instead",
+                        name
+                    );
+                }
             } else if (propName.equals("index")) {
                 builder.index(XContentMapValues.nodeBooleanValue(propNode, name + ".index"));
                 iterator.remove();
