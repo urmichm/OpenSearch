@@ -468,7 +468,6 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
         return (RangeFieldMapper) super.clone();
     }
 
-    // ISSUE-20497 Range Validation
     @Override
     protected void parseCreateField(ParseContext context) throws IOException {
         Range range = parseRange(context);
