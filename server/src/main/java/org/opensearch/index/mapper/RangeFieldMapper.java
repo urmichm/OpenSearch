@@ -519,23 +519,13 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                     continue; // only field name is required in this iteration
                 }
                 try {
-                    if (fieldName.equals(GT_FIELD.getPreferredName())) {
-                        includeFrom = false;
+                    if (fieldName.equals(GT_FIELD.getPreferredName()) || fieldName.equals(GTE_FIELD.getPreferredName())) {
+                        includeFrom = fieldName.equals(GTE_FIELD.getPreferredName());
                         if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
                             from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                         }
-                    } else if (fieldName.equals(GTE_FIELD.getPreferredName())) {
-                        includeFrom = true;
-                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                            from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                        }
-                    } else if (fieldName.equals(LT_FIELD.getPreferredName())) {
-                        includeTo = false;
-                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                            to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                        }
-                    } else if (fieldName.equals(LTE_FIELD.getPreferredName())) {
-                        includeTo = true;
+                    } else if (fieldName.equals(LT_FIELD.getPreferredName()) || fieldName.equals(LTE_FIELD.getPreferredName())) {
+                        includeTo = fieldName.equals(LTE_FIELD.getPreferredName());
                         if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
                             to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
                         }
