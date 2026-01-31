@@ -507,8 +507,8 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
             RangeFieldType fieldType = fieldType();
             RangeType rangeType = fieldType.rangeType;
             String fieldName = null;
-            Object from = rangeType.minValue();
-            Object to = rangeType.maxValue();
+            Object from = null;
+            Object to = null;
             boolean includeFrom = DEFAULT_INCLUDE_LOWER;
             boolean includeTo = DEFAULT_INCLUDE_UPPER;
             XContentParser.Token token;
@@ -528,9 +528,15 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                 }
                 try {
                     if (fieldName.equals(GT_FIELD.getPreferredName()) || fieldName.equals(GTE_FIELD.getPreferredName())) {
+                        if (from != null) {
+                            throw new MapperParsingException("error parsing field [" + name() + "], invalid lower bound (gt/gte)");
+                        }
                         includeFrom = fieldName.equals(GTE_FIELD.getPreferredName());
                         from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                     } else if (fieldName.equals(LT_FIELD.getPreferredName()) || fieldName.equals(LTE_FIELD.getPreferredName())) {
+                        if (to != null) {
+                            throw new MapperParsingException("error parsing field [" + name() + "], invalid upper bound (lt/lte)");
+                        }
                         includeTo = fieldName.equals(LTE_FIELD.getPreferredName());
                         to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
                     } else {
@@ -551,6 +557,14 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
             if (rangeIsMalformed) {
                 context.addIgnoredField(fieldType().name());
                 return null;
+            }
+
+            // default values for unset range bounds
+            if (from == null) {
+                from = rangeType.minValue();
+            }
+            if (to == null) {
+                to = rangeType.maxValue();
             }
 
             return new Range(rangeType, from, to, includeFrom, includeTo);
