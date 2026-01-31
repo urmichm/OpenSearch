@@ -491,6 +491,18 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
         if (start == XContentParser.Token.VALUE_NULL) {
             return null;
         }
+        if (fieldType().rangeType == RangeType.IP && start == XContentParser.Token.VALUE_STRING) {
+            try {
+                return parseIpRangeFromCidr(parser);
+            } catch (IllegalArgumentException e) {
+                if (ignoreMalformed().value()) {
+                    context.addIgnoredField(fieldType().name());
+                    return null;
+                } else {
+                    throw e;
+                }
+            }
+        }
         if (start == XContentParser.Token.START_OBJECT) {
             RangeFieldType fieldType = fieldType();
             RangeType rangeType = fieldType.rangeType;
@@ -548,18 +560,6 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
             }
 
             return new Range(rangeType, from, to, includeFrom, includeTo);
-        }
-        if (fieldType().rangeType == RangeType.IP && start == XContentParser.Token.VALUE_STRING) {
-            try {
-                return parseIpRangeFromCidr(parser);
-            } catch (IllegalArgumentException e) {
-                if (ignoreMalformed().value()) {
-                    context.addIgnoredField(fieldType().name());
-                    return null;
-                } else {
-                    throw e;
-                }
-            }
         }
         // all valid options exhausted
         throw new MapperParsingException("error parsing field [" + name() + "], expected an object but got " + parser.currentName());
