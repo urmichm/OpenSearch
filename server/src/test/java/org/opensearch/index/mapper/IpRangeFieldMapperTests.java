@@ -62,7 +62,7 @@ public class IpRangeFieldMapperTests extends OpenSearchSingleNodeTestCase {
         indexService = createIndex("test");
         parser = indexService.mapperService().documentMapperParser();
     }
-    // ISSUE-20497
+
     public void testStoreCidr() throws Exception {
         XContentBuilder mapping = XContentFactory.jsonBuilder()
             .startObject()
@@ -93,7 +93,7 @@ public class IpRangeFieldMapperTests extends OpenSearchSingleNodeTestCase {
                 + InetAddresses.toAddrString(InetAddresses.forString(entry.getValue()));
             assertThat(storedField.stringValue(), containsString(strVal));
         }
-        // ISSUE-20497: split uni test into two, alternative form as its own unit test
+
         // Use alternative form to populate the value:
         //
         // {
