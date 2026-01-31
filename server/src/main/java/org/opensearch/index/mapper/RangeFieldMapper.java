@@ -471,6 +471,18 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
     // ISSUE-20497 Range Validation
     @Override
     protected void parseCreateField(ParseContext context) throws IOException {
+        Range range = parseRange(context);
+        if (range == null) {
+            return;
+        }
+        context.doc().addAll(fieldType().rangeType.createFields(context, name(), range, index, hasDocValues, store));
+
+        if (hasDocValues == false && (index || store)) {
+            createFieldNamesField(context);
+        }
+    }
+
+    private Range parseRange(ParseContext context) throws IOException {
         Range range;
         if (context.externalValueSet()) {
             range = context.parseExternalValue(Range.class);
@@ -478,7 +490,7 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
             XContentParser parser = context.parser();
             final XContentParser.Token start = parser.currentToken();
             if (start == XContentParser.Token.VALUE_NULL) {
-                return;
+                return null;
             } else if (start == XContentParser.Token.START_OBJECT) {
                 RangeFieldType fieldType = fieldType();
                 RangeType rangeType = fieldType.rangeType;
@@ -532,7 +544,7 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
 
                 if (rangeIsMalformed) {
                     context.addIgnoredField(fieldType().name());
-                    return;
+                    return null;
                 }
 
                 range = new Range(rangeType, from, to, includeFrom, includeTo);
@@ -542,7 +554,7 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                 } catch (IllegalArgumentException e) {
                     if (ignoreMalformed().value()) {
                         context.addIgnoredField(fieldType().name());
-                        return;
+                        return null;
                     } else {
                         throw e;
                     }
@@ -553,11 +565,7 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                 );
             }
         }
-        context.doc().addAll(fieldType().rangeType.createFields(context, name(), range, index, hasDocValues, store));
-
-        if (hasDocValues == false && (index || store)) {
-            createFieldNamesField(context);
-        }
+        return range;
     }
 
     private static Range parseIpRangeFromCidr(final XContentParser parser) throws IOException {
