@@ -483,89 +483,86 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
     }
 
     private Range parseRange(ParseContext context) throws IOException {
-        Range range;
         if (context.externalValueSet()) {
-            range = context.parseExternalValue(Range.class);
-        } else {
-            XContentParser parser = context.parser();
-            final XContentParser.Token start = parser.currentToken();
-            if (start == XContentParser.Token.VALUE_NULL) {
-                return null;
-            } else if (start == XContentParser.Token.START_OBJECT) {
-                RangeFieldType fieldType = fieldType();
-                RangeType rangeType = fieldType.rangeType;
-                String fieldName = null;
-                Object from = rangeType.minValue();
-                Object to = rangeType.maxValue();
-                boolean includeFrom = DEFAULT_INCLUDE_LOWER;
-                boolean includeTo = DEFAULT_INCLUDE_UPPER;
-                XContentParser.Token token;
-                boolean rangeIsMalformed = false;
-                while ((token = parser.nextToken()) != XContentParser.Token.END_OBJECT) {
-                    if (token == XContentParser.Token.FIELD_NAME) {
-                        fieldName = parser.currentName();
-                    } else {
-                        try {
-                            if (fieldName.equals(GT_FIELD.getPreferredName())) {
-                                includeFrom = false;
-                                if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                    from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                                }
-                            } else if (fieldName.equals(GTE_FIELD.getPreferredName())) {
-                                includeFrom = true;
-                                if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                    from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                                }
-                            } else if (fieldName.equals(LT_FIELD.getPreferredName())) {
-                                includeTo = false;
-                                if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                    to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                                }
-                            } else if (fieldName.equals(LTE_FIELD.getPreferredName())) {
-                                includeTo = true;
-                                if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                    to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                                }
-                            } else {
-                                throw new MapperParsingException(
-                                    "error parsing field [" + name() + "], with unknown parameter [" + fieldName + "]"
-                                );
+            return context.parseExternalValue(Range.class);
+        }
+        XContentParser parser = context.parser();
+        final XContentParser.Token start = parser.currentToken();
+        if (start == XContentParser.Token.VALUE_NULL) {
+            return null;
+        }
+        if (start == XContentParser.Token.START_OBJECT) {
+            RangeFieldType fieldType = fieldType();
+            RangeType rangeType = fieldType.rangeType;
+            String fieldName = null;
+            Object from = rangeType.minValue();
+            Object to = rangeType.maxValue();
+            boolean includeFrom = DEFAULT_INCLUDE_LOWER;
+            boolean includeTo = DEFAULT_INCLUDE_UPPER;
+            XContentParser.Token token;
+            boolean rangeIsMalformed = false;
+            while ((token = parser.nextToken()) != XContentParser.Token.END_OBJECT) {
+                if (token == XContentParser.Token.FIELD_NAME) {
+                    fieldName = parser.currentName();
+                } else {
+                    try {
+                        if (fieldName.equals(GT_FIELD.getPreferredName())) {
+                            includeFrom = false;
+                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                                from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                             }
-                        } catch (final IllegalArgumentException e) {
-                            // We have to consume the JSON object in full
-                            if (ignoreMalformed().value()) {
-                                rangeIsMalformed = true;
-                            } else {
-                                throw e;
+                        } else if (fieldName.equals(GTE_FIELD.getPreferredName())) {
+                            includeFrom = true;
+                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                                from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                             }
+                        } else if (fieldName.equals(LT_FIELD.getPreferredName())) {
+                            includeTo = false;
+                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                                to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
+                            }
+                        } else if (fieldName.equals(LTE_FIELD.getPreferredName())) {
+                            includeTo = true;
+                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                                to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
+                            }
+                        } else {
+                            throw new MapperParsingException(
+                                "error parsing field [" + name() + "], with unknown parameter [" + fieldName + "]"
+                            );
+                        }
+                    } catch (final IllegalArgumentException e) {
+                        // We have to consume the JSON object in full
+                        if (ignoreMalformed().value()) {
+                            rangeIsMalformed = true;
+                        } else {
+                            throw e;
                         }
                     }
                 }
+            }
 
-                if (rangeIsMalformed) {
+            if (rangeIsMalformed) {
+                context.addIgnoredField(fieldType().name());
+                return null;
+            }
+
+            return new Range(rangeType, from, to, includeFrom, includeTo);
+        }
+        if (fieldType().rangeType == RangeType.IP && start == XContentParser.Token.VALUE_STRING) {
+            try {
+                return parseIpRangeFromCidr(parser);
+            } catch (IllegalArgumentException e) {
+                if (ignoreMalformed().value()) {
                     context.addIgnoredField(fieldType().name());
                     return null;
+                } else {
+                    throw e;
                 }
-
-                range = new Range(rangeType, from, to, includeFrom, includeTo);
-            } else if (fieldType().rangeType == RangeType.IP && start == XContentParser.Token.VALUE_STRING) {
-                try {
-                    range = parseIpRangeFromCidr(parser);
-                } catch (IllegalArgumentException e) {
-                    if (ignoreMalformed().value()) {
-                        context.addIgnoredField(fieldType().name());
-                        return null;
-                    } else {
-                        throw e;
-                    }
-                }
-            } else {
-                throw new MapperParsingException(
-                    "error parsing field [" + name() + "], expected an object but got " + parser.currentName()
-                );
             }
         }
-        return range;
+        // all valid options exhausted
+        throw new MapperParsingException("error parsing field [" + name() + "], expected an object but got " + parser.currentName());
     }
 
     private static Range parseIpRangeFromCidr(final XContentParser parser) throws IOException {
