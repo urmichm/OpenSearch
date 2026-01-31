@@ -518,17 +518,18 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                     fieldName = parser.currentName();
                     continue; // only field name is required in this iteration
                 }
+                if (parser.currentToken() == XContentParser.Token.VALUE_NULL) {
+                    // null values are currently allowed, disallowing it will result in breaking changes
+                    // current implementation, skips the null values, therefore 'continue'
+                    continue;
+                }
                 try {
                     if (fieldName.equals(GT_FIELD.getPreferredName()) || fieldName.equals(GTE_FIELD.getPreferredName())) {
                         includeFrom = fieldName.equals(GTE_FIELD.getPreferredName());
-                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                            from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                        }
+                        from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                     } else if (fieldName.equals(LT_FIELD.getPreferredName()) || fieldName.equals(LTE_FIELD.getPreferredName())) {
                         includeTo = fieldName.equals(LTE_FIELD.getPreferredName());
-                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                            to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                        }
+                        to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
                     } else {
                         throw new MapperParsingException(
                             "error parsing field [" + name() + "], with unknown parameter [" + fieldName + "]"
