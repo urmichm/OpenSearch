@@ -516,40 +516,40 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
             while ((token = parser.nextToken()) != XContentParser.Token.END_OBJECT) {
                 if (token == XContentParser.Token.FIELD_NAME) {
                     fieldName = parser.currentName();
-                } else {
-                    try {
-                        if (fieldName.equals(GT_FIELD.getPreferredName())) {
-                            includeFrom = false;
-                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                            }
-                        } else if (fieldName.equals(GTE_FIELD.getPreferredName())) {
-                            includeFrom = true;
-                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
-                            }
-                        } else if (fieldName.equals(LT_FIELD.getPreferredName())) {
-                            includeTo = false;
-                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                            }
-                        } else if (fieldName.equals(LTE_FIELD.getPreferredName())) {
-                            includeTo = true;
-                            if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
-                                to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
-                            }
-                        } else {
-                            throw new MapperParsingException(
-                                "error parsing field [" + name() + "], with unknown parameter [" + fieldName + "]"
-                            );
+                    continue; // only field name is required in this iteration
+                }
+                try {
+                    if (fieldName.equals(GT_FIELD.getPreferredName())) {
+                        includeFrom = false;
+                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                            from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                         }
-                    } catch (final IllegalArgumentException e) {
-                        // We have to consume the JSON object in full
-                        if (ignoreMalformed().value()) {
-                            rangeIsMalformed = true;
-                        } else {
-                            throw e;
+                    } else if (fieldName.equals(GTE_FIELD.getPreferredName())) {
+                        includeFrom = true;
+                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                            from = rangeType.parseFrom(fieldType, parser, coerce.value(), includeFrom);
                         }
+                    } else if (fieldName.equals(LT_FIELD.getPreferredName())) {
+                        includeTo = false;
+                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                            to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
+                        }
+                    } else if (fieldName.equals(LTE_FIELD.getPreferredName())) {
+                        includeTo = true;
+                        if (parser.currentToken() != XContentParser.Token.VALUE_NULL) {
+                            to = rangeType.parseTo(fieldType, parser, coerce.value(), includeTo);
+                        }
+                    } else {
+                        throw new MapperParsingException(
+                            "error parsing field [" + name() + "], with unknown parameter [" + fieldName + "]"
+                        );
+                    }
+                } catch (final IllegalArgumentException e) {
+                    // We have to consume the JSON object in full
+                    if (ignoreMalformed().value()) {
+                        rangeIsMalformed = true;
+                    } else {
+                        throw e;
                     }
                 }
             }
