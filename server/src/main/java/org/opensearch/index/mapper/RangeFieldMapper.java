@@ -518,6 +518,9 @@ public class RangeFieldMapper extends ParametrizedFieldMapper {
                     fieldName = parser.currentName();
                     continue; // only field name is required in this iteration
                 }
+                if (fieldName == null) {
+                    throw new MapperParsingException("error parsing field [" + name() + "], parameter cannot be null");
+                }
                 if (parser.currentToken() == XContentParser.Token.VALUE_NULL) {
                     // null values are currently allowed, disallowing it will result in breaking changes
                     // current implementation, skips the null values, therefore 'continue'
