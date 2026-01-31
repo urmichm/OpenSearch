@@ -354,6 +354,7 @@ public class RangeQueryBuilder extends AbstractQueryBuilder<RangeQueryBuilder>
         builder.endObject();
     }
 
+    // ISSUE-20497 Range Validation
     public static RangeQueryBuilder fromXContent(XContentParser parser) throws IOException {
         String fieldName = null;
         Object from = null;
