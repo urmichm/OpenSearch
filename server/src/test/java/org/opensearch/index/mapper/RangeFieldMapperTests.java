@@ -406,36 +406,30 @@ public class RangeFieldMapperTests extends AbstractNumericFieldMapperTestCase {
     }
 
     public void testInvalidRangeBounds() throws Exception {
-        DocumentMapper mapper = createDocumentMapper(
-            rangeFieldMapping("long_range", b -> b.field("store", true))
-        );
+        DocumentMapper mapper = createDocumentMapper(rangeFieldMapping("long_range", b -> b.field("store", true)));
         MapperParsingException mpe = expectThrows(
             MapperParsingException.class,
             () -> mapper.parse(
-                source(b -> b.startObject("field")
-                    .field(GT_FIELD.getPreferredName(), FROM)
-                    .field(GTE_FIELD.getPreferredName(), TO)
-                    .endObject())
+                source(
+                    b -> b.startObject("field").field(GT_FIELD.getPreferredName(), FROM).field(GTE_FIELD.getPreferredName(), TO).endObject()
+                )
             )
         );
-        assertThat(
-            mpe.getDetailedMessage(),
-            containsString("error parsing field [field], invalid lower bound (gt/gte)")
-        );
+        assertThat(mpe.getDetailedMessage(), containsString("error parsing field [field], invalid lower bound (gt/gte)"));
 
         mpe = expectThrows(
             MapperParsingException.class,
             () -> mapper.parse(
-                source(b -> b.startObject("field")
-                    .field(LT_FIELD.getPreferredName(), FROM)
-                    .field(LTE_FIELD.getPreferredName(), TO)
-                    .endObject())
+                source(
+                    b -> b.startObject("field")
+                        .field(GT_FIELD.getPreferredName(), FROM)
+                        .field(LT_FIELD.getPreferredName(), TO)
+                        .field(LTE_FIELD.getPreferredName(), TO)
+                        .endObject()
+                )
             )
         );
-        assertThat(
-            mpe.getDetailedMessage(),
-            containsString("error parsing field [field], invalid upper bound (lt/lte)")
-        );
+        assertThat(mpe.getDetailedMessage(), containsString("error parsing field [field], invalid upper bound (lt/lte)"));
     }
 
     public void testUpdatesWithSameMappings() throws Exception {
