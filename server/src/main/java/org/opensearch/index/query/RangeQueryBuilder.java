@@ -43,6 +43,7 @@ import org.opensearch.core.common.ParsingException;
 import org.opensearch.core.common.Strings;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.common.io.stream.StreamOutput;
+import org.opensearch.core.xcontent.DeprecationHandler;
 import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.core.xcontent.XContentParser;
 import org.opensearch.index.mapper.FieldNamesFieldMapper;
@@ -383,47 +384,48 @@ public class RangeQueryBuilder extends AbstractQueryBuilder<RangeQueryBuilder>
                         currentFieldName = parser.currentName();
                         continue; // only field name is required in this iteration
                     }
-                    if (FROM_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    DeprecationHandler deprecationHandler = parser.getDeprecationHandler();
+                    if (FROM_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (from != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         from = maybeConvertToBytesRef(parser.objectBytes());
-                    } else if (TO_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (TO_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (to != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         to = maybeConvertToBytesRef(parser.objectBytes());
-                    } else if (INCLUDE_LOWER_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (INCLUDE_LOWER_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (includeLower != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         includeLower = parser.booleanValue();
-                    } else if (INCLUDE_UPPER_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (INCLUDE_UPPER_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (includeUpper != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         includeUpper = parser.booleanValue();
-                    } else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName, deprecationHandler)) {
                         boost = parser.floatValue();
-                    } else if (GT_FIELD.match(currentFieldName, parser.getDeprecationHandler()) || GTE_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (GT_FIELD.match(currentFieldName, deprecationHandler) || GTE_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (from != null || includeLower != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         from = maybeConvertToBytesRef(parser.objectBytes());
-                        includeLower = GTE_FIELD.match(currentFieldName, parser.getDeprecationHandler());
-                    } else if (LT_FIELD.match(currentFieldName, parser.getDeprecationHandler()) || LTE_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                        includeLower = GTE_FIELD.match(currentFieldName, deprecationHandler);
+                    } else if (LT_FIELD.match(currentFieldName, deprecationHandler) || LTE_FIELD.match(currentFieldName, deprecationHandler)) {
                         if (to != null || includeUpper != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         to = maybeConvertToBytesRef(parser.objectBytes());
-                        includeUpper = LTE_FIELD.match(currentFieldName, parser.getDeprecationHandler());
-                    } else if (TIME_ZONE_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                        includeUpper = LTE_FIELD.match(currentFieldName, deprecationHandler);
+                    } else if (TIME_ZONE_FIELD.match(currentFieldName, deprecationHandler)) {
                         timeZone = parser.text();
-                    } else if (FORMAT_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (FORMAT_FIELD.match(currentFieldName, deprecationHandler)) {
                         format = parser.text();
-                    } else if (RELATION_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (RELATION_FIELD.match(currentFieldName, deprecationHandler)) {
                         relation = parser.text();
-                    } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName, deprecationHandler)) {
                         queryName = parser.text();
                     } else {
                         throw new ParsingException(
