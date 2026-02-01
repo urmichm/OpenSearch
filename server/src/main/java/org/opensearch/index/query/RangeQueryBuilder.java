@@ -428,10 +428,7 @@ public class RangeQueryBuilder extends AbstractQueryBuilder<RangeQueryBuilder>
                     } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName, depHandler)) {
                         queryName = parser.text();
                     } else {
-                        throw new ParsingException(
-                            parser.getTokenLocation(),
-                            "[range] query does not support [" + currentFieldName + "]"
-                        );
+                        throw new ParsingException(parser.getTokenLocation(), "[range] query does not support [" + currentFieldName + "]");
                     }
                 }
             } else if (token.isValue()) {
