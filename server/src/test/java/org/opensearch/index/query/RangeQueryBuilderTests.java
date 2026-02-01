@@ -500,7 +500,7 @@ public class RangeQueryBuilderTests extends AbstractQueryTestCase<RangeQueryBuil
         assertEquals(json, "now", parsed.to());
     }
 
-    public void testInvalidUpperBound() throws IOException{
+    public void testInvalidUpperBound() throws IOException {
         final String json = "{\n"
             + "  \"range\" : {\n"
             + "    \"timestamp\" : {\n"
@@ -515,14 +515,11 @@ public class RangeQueryBuilderTests extends AbstractQueryTestCase<RangeQueryBuil
             + "  }\n"
             + "}";
 
-        ParsingException pe = expectThrows(
-            ParsingException.class,
-            () -> parseQuery(json)
-        );
+        ParsingException pe = expectThrows(ParsingException.class, () -> parseQuery(json));
         assertEquals("invalid upper bound for [range] query", pe.getMessage());
     }
 
-    public void testInvalidLowerBound() throws IOException{
+    public void testInvalidLowerBound() {
         {
             final String json = "{\n"
                 + "  \"range\" : {\n"
@@ -534,10 +531,7 @@ public class RangeQueryBuilderTests extends AbstractQueryTestCase<RangeQueryBuil
                 + "  }\n"
                 + "}";
 
-            ParsingException pe = expectThrows(
-                ParsingException.class,
-                () -> parseQuery(json)
-            );
+            ParsingException pe = expectThrows(ParsingException.class, () -> parseQuery(json));
             assertEquals("invalid lower bound for [range] query", pe.getMessage());
         }
         {
@@ -551,10 +545,7 @@ public class RangeQueryBuilderTests extends AbstractQueryTestCase<RangeQueryBuil
                 + "  }\n"
                 + "}";
 
-            ParsingException pe = expectThrows(
-                ParsingException.class,
-                () -> parseQuery(json2)
-            );
+            ParsingException pe = expectThrows(ParsingException.class, () -> parseQuery(json2));
             assertEquals("invalid lower bound for [range] query", pe.getMessage());
         }
     }
