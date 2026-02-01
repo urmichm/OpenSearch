@@ -406,7 +406,7 @@ public class RangeFieldMapperTests extends AbstractNumericFieldMapperTestCase {
     }
 
     public void testInvalidRangeBounds() throws Exception {
-        DocumentMapper mapper = createDocumentMapper(rangeFieldMapping("long_range", b -> b.field("store", true)));
+        final DocumentMapper mapper = createDocumentMapper(rangeFieldMapping("long_range", b -> b.field("store", true)));
         MapperParsingException mpe = expectThrows(
             MapperParsingException.class,
             () -> mapper.parse(
@@ -430,6 +430,20 @@ public class RangeFieldMapperTests extends AbstractNumericFieldMapperTestCase {
             )
         );
         assertThat(mpe.getDetailedMessage(), containsString("error parsing field [field], invalid upper bound (lt/lte)"));
+
+        mpe = expectThrows(
+            MapperParsingException.class,
+            () -> mapper.parse(
+                source(
+                    b -> b.startObject("field")
+                        .field(GT_FIELD.getPreferredName(), FROM)
+                        .field(LT_FIELD.getPreferredName(), TO)
+                        .field(GTE_FIELD.getPreferredName(), TO)
+                        .endObject()
+                )
+            )
+        );
+        assertThat(mpe.getDetailedMessage(), containsString("error parsing field [field], invalid lower bound (gt/gte)"));
     }
 
     public void testUpdatesWithSameMappings() throws Exception {
