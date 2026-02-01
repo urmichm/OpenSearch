@@ -384,48 +384,48 @@ public class RangeQueryBuilder extends AbstractQueryBuilder<RangeQueryBuilder>
                         currentFieldName = parser.currentName();
                         continue; // only field name is required in this iteration
                     }
-                    DeprecationHandler deprecationHandler = parser.getDeprecationHandler();
-                    if (FROM_FIELD.match(currentFieldName, deprecationHandler)) {
+                    DeprecationHandler depHandler = parser.getDeprecationHandler();
+                    if (FROM_FIELD.match(currentFieldName, depHandler)) {
                         if (from != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         from = maybeConvertToBytesRef(parser.objectBytes());
-                    } else if (TO_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (TO_FIELD.match(currentFieldName, depHandler)) {
                         if (to != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         to = maybeConvertToBytesRef(parser.objectBytes());
-                    } else if (INCLUDE_LOWER_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (INCLUDE_LOWER_FIELD.match(currentFieldName, depHandler)) {
                         if (includeLower != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         includeLower = parser.booleanValue();
-                    } else if (INCLUDE_UPPER_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (INCLUDE_UPPER_FIELD.match(currentFieldName, depHandler)) {
                         if (includeUpper != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         includeUpper = parser.booleanValue();
-                    } else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName, depHandler)) {
                         boost = parser.floatValue();
-                    } else if (GT_FIELD.match(currentFieldName, deprecationHandler) || GTE_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (GT_FIELD.match(currentFieldName, depHandler) || GTE_FIELD.match(currentFieldName, depHandler)) {
                         if (from != null || includeLower != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_LOWER_BOUND_MESSAGE);
                         }
                         from = maybeConvertToBytesRef(parser.objectBytes());
-                        includeLower = GTE_FIELD.match(currentFieldName, deprecationHandler);
-                    } else if (LT_FIELD.match(currentFieldName, deprecationHandler) || LTE_FIELD.match(currentFieldName, deprecationHandler)) {
+                        includeLower = GTE_FIELD.match(currentFieldName, depHandler);
+                    } else if (LT_FIELD.match(currentFieldName, depHandler) || LTE_FIELD.match(currentFieldName, depHandler)) {
                         if (to != null || includeUpper != null) {
                             throw new ParsingException(parser.getTokenLocation(), INVALID_UPPER_BOUND_MESSAGE);
                         }
                         to = maybeConvertToBytesRef(parser.objectBytes());
-                        includeUpper = LTE_FIELD.match(currentFieldName, deprecationHandler);
-                    } else if (TIME_ZONE_FIELD.match(currentFieldName, deprecationHandler)) {
+                        includeUpper = LTE_FIELD.match(currentFieldName, depHandler);
+                    } else if (TIME_ZONE_FIELD.match(currentFieldName, depHandler)) {
                         timeZone = parser.text();
-                    } else if (FORMAT_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (FORMAT_FIELD.match(currentFieldName, depHandler)) {
                         format = parser.text();
-                    } else if (RELATION_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (RELATION_FIELD.match(currentFieldName, depHandler)) {
                         relation = parser.text();
-                    } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName, deprecationHandler)) {
+                    } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName, depHandler)) {
                         queryName = parser.text();
                     } else {
                         throw new ParsingException(
