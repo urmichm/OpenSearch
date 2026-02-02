@@ -260,21 +260,21 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         try {
             XContentBuilder mapping = XContentFactory.jsonBuilder()
                 .startObject()
-                .startObject("properties")
-                .startObject("field1")
-                .field("type", "text")
-                .startObject("meta")
-                .field("metric_type", "counter")
-                .endObject()
-                .startObject("_meta")
-                .field("unit", "milliseconds")
-                .endObject()
-                .endObject()
-                .startObject("field2")
-                .field("type", "keyword")
-                // No meta block - testing mixed scenario
-                .endObject()
-                .endObject()
+                    .startObject("properties")
+                        .startObject("field1")
+                            .field("type", "text")
+                            .startObject("meta")
+                                .field("metric_type", "counter")
+                            .endObject()
+                            .startObject("_meta")
+                                .field("unit", "milliseconds")
+                            .endObject()
+                        .endObject()
+                        .startObject("field2")
+                            .field("type", "keyword")
+                            // No meta block - testing mixed scenario
+                        .endObject()
+                    .endObject()
                 .endObject();
 
             prepareCreate("test").setMapping(mapping).get();
