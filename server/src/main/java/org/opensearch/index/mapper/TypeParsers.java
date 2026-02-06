@@ -81,9 +81,7 @@ public class TypeParsers {
     public static Map<String, String> parseMeta(String name, Object metaObject) {
         if (metaObject instanceof Map == false) {
             throw new MapperParsingException(
-                "[_meta] must be an object, got " +
-                    metaObject.getClass().getSimpleName() +
-                    "[" + metaObject + "] for field [" + name + "]"
+                "[_meta] must be an object, got " + metaObject.getClass().getSimpleName() + "[" + metaObject + "] for field [" + name + "]"
             );
         }
         @SuppressWarnings("unchecked")
@@ -136,11 +134,7 @@ public class TypeParsers {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
                 if (propName.equals("meta")) {
-                    deprecationLogger.deprecate(
-                        "meta",
-                        "Parameter [meta] on field [{}] is deprecated, use [_meta] instead",
-                        name
-                    );
+                    deprecationLogger.deprecate("meta", "Parameter [meta] on field [{}] is deprecated, use [_meta] instead", name);
                 }
             } else if (propName.equals("index")) {
                 builder.index(XContentMapValues.nodeBooleanValue(propNode, name + ".index"));

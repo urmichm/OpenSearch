@@ -670,8 +670,7 @@ public abstract class ParametrizedFieldMapper extends FieldMapper {
             Map<String, Parameter<?>> deprecatedParamsMap = new HashMap<>();
             if (fieldNode.containsKey("meta") && fieldNode.containsKey("_meta")) {
                 throw new MapperParsingException(
-                    "Cannot specify both [_meta] and [meta] for field [" + name + "]. " +
-                        "Use [_meta] as the canonical form."
+                    "Cannot specify both [_meta] and [meta] for field [" + name + "]. " + "Use [_meta] as the canonical form."
                 );
             }
             for (Parameter<?> param : getParameters()) {

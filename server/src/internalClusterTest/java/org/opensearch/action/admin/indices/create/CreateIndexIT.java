@@ -77,11 +77,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.opensearch.cluster.metadata.IndexMetadata.SETTING_WAIT_FOR_ACTIVE_SHARDS;
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertAcked;
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertBlocked;
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertRequestBuilderThrows;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -204,26 +204,26 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
     public void testCreateIndexWithFieldLevelMeta() throws Exception {
         XContentBuilder mapping = XContentFactory.jsonBuilder()
             .startObject()
-                .startObject("properties")
-                    .startObject("field1")
-                        .field("type", "text")
-                        .startObject("meta")
-                            .field("unit", "milliseconds")
-                            .field("metric_type", "counter")
-                        .endObject()
-                    .endObject()
-                    .startObject("field2")
-                        .field("type", "long")
-                        .startObject("_meta")
-                            .field("description", "User count")
-                            .field("format", "number")
-                        .endObject()
-                    .endObject()
-                    .startObject("field3")
-                        .field("type", "keyword")
-                    // No meta block - testing mixed scenario
-                    .endObject()
-                .endObject()
+            .startObject("properties")
+            .startObject("field1")
+            .field("type", "text")
+            .startObject("meta")
+            .field("unit", "milliseconds")
+            .field("metric_type", "counter")
+            .endObject()
+            .endObject()
+            .startObject("field2")
+            .field("type", "long")
+            .startObject("_meta")
+            .field("description", "User count")
+            .field("format", "number")
+            .endObject()
+            .endObject()
+            .startObject("field3")
+            .field("type", "keyword")
+            // No meta block - testing mixed scenario
+            .endObject()
+            .endObject()
             .endObject();
 
         assertAcked(prepareCreate("test").setMapping(mapping));
@@ -258,21 +258,21 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         try {
             XContentBuilder mapping = XContentFactory.jsonBuilder()
                 .startObject()
-                    .startObject("properties")
-                        .startObject("field1")
-                            .field("type", "text")
-                            .startObject("meta")
-                                .field("metric_type", "counter")
-                            .endObject()
-                            .startObject("_meta")
-                                .field("unit", "milliseconds")
-                            .endObject()
-                        .endObject()
-                        .startObject("field2")
-                            .field("type", "keyword")
-                            // No meta block - testing mixed scenario
-                        .endObject()
-                    .endObject()
+                .startObject("properties")
+                .startObject("field1")
+                .field("type", "text")
+                .startObject("meta")
+                .field("metric_type", "counter")
+                .endObject()
+                .startObject("_meta")
+                .field("unit", "milliseconds")
+                .endObject()
+                .endObject()
+                .startObject("field2")
+                .field("type", "keyword")
+                // No meta block - testing mixed scenario
+                .endObject()
+                .endObject()
                 .endObject();
 
             prepareCreate("test").setMapping(mapping).get();
