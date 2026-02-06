@@ -33,6 +33,7 @@
 package org.opensearch.index.mapper;
 
 import org.apache.lucene.index.IndexOptions;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.time.DateFormatter;
@@ -117,7 +118,7 @@ public class TypeParsers {
         Map<String, Object> fieldNode,
         Mapper.TypeParser.ParserContext parserContext
     ) {
-        if (fieldNode.containsKey("meta") && fieldNode.containsKey("_meta")) {
+        if (fieldNode.containsKey(OpenSearchNames.META_NAME) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META_NAME)) {
             throw new MapperParsingException(
                 "Cannot specify both [_meta] and [meta] for field [" + name + "]. Use [_meta] as the canonical form."
             );
@@ -130,11 +131,19 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals("_meta") || propName.equals("meta")) {
+            } else if (propName.equals(OpenSearchNames.META_NAME) || propName.equals(OpenSearchNames.DEPRECATED_META_NAME)) {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
-                if (propName.equals("meta")) {
-                    deprecationLogger.deprecate("meta", "Parameter [meta] on field [{}] is deprecated, use [_meta] instead", name);
+                if (propName.equals(OpenSearchNames.DEPRECATED_META_NAME)) {
+                    deprecationLogger.deprecate(
+                        OpenSearchNames.DEPRECATED_META_NAME,
+                        "Parameter ["
+                            + OpenSearchNames.DEPRECATED_META_NAME
+                            + "] on field [{}] is deprecated, use ["
+                            + OpenSearchNames.META_NAME
+                            + "] instead",
+                        name
+                    );
                 }
             } else if (propName.equals("index")) {
                 builder.index(XContentMapValues.nodeBooleanValue(propNode, name + ".index"));

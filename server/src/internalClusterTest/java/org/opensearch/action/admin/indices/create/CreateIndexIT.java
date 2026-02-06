@@ -32,6 +32,7 @@
 
 package org.opensearch.action.admin.indices.create;
 
+import org.opensearch.OpenSearchNames;
 import org.opensearch.action.UnavailableShardsException;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.action.admin.indices.alias.Alias;
@@ -207,14 +208,14 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
             .startObject("properties")
             .startObject("field1")
             .field("type", "text")
-            .startObject("meta")
+            .startObject(OpenSearchNames.DEPRECATED_META_NAME)
             .field("unit", "milliseconds")
             .field("metric_type", "counter")
             .endObject()
             .endObject()
             .startObject("field2")
             .field("type", "long")
-            .startObject("_meta")
+            .startObject(OpenSearchNames.META_NAME)
             .field("description", "User count")
             .field("format", "number")
             .endObject()
@@ -237,21 +238,23 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
 
         // Verify field1 meta
         Map<String, Object> field1 = (Map<String, Object>) properties.get("field1");
-        Map<String, Object> field1Meta = (Map<String, Object>) field1.get("_meta"); // meta block on field level is stored under _meta
+        Map<String, Object> field1Meta = (Map<String, Object>) field1.get(OpenSearchNames.META_NAME); // meta block on field level is stored
+                                                                                                      // under _meta
         assertNotNull(field1Meta);
         assertEquals("milliseconds", field1Meta.get("unit"));
         assertEquals("counter", field1Meta.get("metric_type"));
 
         // Verify field2 meta
         Map<String, Object> field2 = (Map<String, Object>) properties.get("field2");
-        Map<String, Object> field2Meta = (Map<String, Object>) field2.get("_meta"); // meta block on field level is stored under _meta
+        Map<String, Object> field2Meta = (Map<String, Object>) field2.get(OpenSearchNames.META_NAME); // meta block on field level is stored
+                                                                                                      // under _meta
         assertNotNull(field2Meta);
         assertEquals("User count", field2Meta.get("description"));
         assertEquals("number", field2Meta.get("format"));
 
         // Verify field3 has no meta
         Map<String, Object> field3 = (Map<String, Object>) properties.get("field3");
-        assertNull(field3.get("_meta"));
+        assertNull(field3.get(OpenSearchNames.META_NAME));
     }
 
     public void testCreateIndexWithConflictingFieldLevelMeta() throws Exception {
@@ -261,10 +264,10 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
                 .startObject("properties")
                 .startObject("field1")
                 .field("type", "text")
-                .startObject("meta")
+                .startObject(OpenSearchNames.DEPRECATED_META_NAME)
                 .field("metric_type", "counter")
                 .endObject()
-                .startObject("_meta")
+                .startObject(OpenSearchNames.META_NAME)
                 .field("unit", "milliseconds")
                 .endObject()
                 .endObject()
