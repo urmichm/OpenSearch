@@ -201,7 +201,6 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         disableIndexBlock("test", IndexMetadata.SETTING_BLOCKS_METADATA);
     }
 
-    // ISSUE-19884: Request accepts both 'meta' and '_meta' for a field, but stores it under '_meta'
     public void testCreateIndexWithFieldLevelMeta() throws Exception {
         XContentBuilder mapping = XContentFactory.jsonBuilder()
             .startObject()
@@ -255,7 +254,6 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         assertNull(field3.get("_meta"));
     }
 
-    // ISSUE-19884: Request rejected when both 'meta' and '_meta' fields for a field present
     public void testCreateIndexWithConflictingFieldLevelMeta() throws Exception {
         try {
             XContentBuilder mapping = XContentFactory.jsonBuilder()

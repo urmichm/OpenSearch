@@ -62,8 +62,6 @@ import java.util.Spliterators;
 import java.util.TreeMap;
 import java.util.stream.StreamSupport;
 
-// ISSUE-19884 : Important class
-
 /**
  * The base OpenSearch Field Mapper
  *
