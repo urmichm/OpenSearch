@@ -33,6 +33,7 @@ package org.opensearch.search.aggregations;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.action.ActionRequestValidationException;
 import org.opensearch.common.annotation.PublicApi;
 import org.opensearch.common.xcontent.SuggestingErrorOnUnknown;
@@ -165,7 +166,7 @@ public class AggregatorFactories {
                 token = parser.nextToken();
                 if (token == XContentParser.Token.START_OBJECT) {
                     switch (fieldName) {
-                        case "meta":
+                        case OpenSearchNames.META:
                             metadata = parser.map();
                             break;
                         case "aggregations":

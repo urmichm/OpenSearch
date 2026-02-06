@@ -33,6 +33,7 @@
 package org.opensearch.index.mapper;
 
 import org.apache.lucene.index.IndexOptions;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.time.DateFormatter;
@@ -81,9 +82,7 @@ public class TypeParsers {
     public static Map<String, String> parseMeta(String name, Object metaObject) {
         if (metaObject instanceof Map == false) {
             throw new MapperParsingException(
-                "[_meta] must be an object, got " +
-                    metaObject.getClass().getSimpleName() +
-                    "[" + metaObject + "] for field [" + name + "]"
+                "[_meta] must be an object, got " + metaObject.getClass().getSimpleName() + "[" + metaObject + "] for field [" + name + "]"
             );
         }
         @SuppressWarnings("unchecked")
@@ -119,7 +118,7 @@ public class TypeParsers {
         Map<String, Object> fieldNode,
         Mapper.TypeParser.ParserContext parserContext
     ) {
-        if (fieldNode.containsKey("meta") && fieldNode.containsKey("_meta")) {
+        if (fieldNode.containsKey(OpenSearchNames.META) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META)) {
             throw new MapperParsingException(
                 "Cannot specify both [_meta] and [meta] for field [" + name + "]. Use [_meta] as the canonical form."
             );
@@ -132,13 +131,17 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals("_meta") || propName.equals("meta")) {
+            } else if (propName.equals(OpenSearchNames.META) || propName.equals(OpenSearchNames.DEPRECATED_META)) {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
-                if (propName.equals("meta")) {
+                if (propName.equals(OpenSearchNames.DEPRECATED_META)) {
                     deprecationLogger.deprecate(
-                        "meta",
-                        "Parameter [meta] on field [{}] is deprecated, use [_meta] instead",
+                        OpenSearchNames.DEPRECATED_META,
+                        "Parameter ["
+                            + OpenSearchNames.DEPRECATED_META
+                            + "] on field [{}] is deprecated, use ["
+                            + OpenSearchNames.META
+                            + "] instead",
                         name
                     );
                 }

@@ -36,6 +36,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.LeafReader;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.common.Explicit;
 import org.opensearch.common.annotation.PublicApi;
 import org.opensearch.common.settings.Setting;
@@ -567,7 +568,7 @@ public abstract class FieldMapper extends Mapper implements Cloneable {
         copyTo.toXContent(builder, params);
 
         if (includeDefaults || fieldType().meta().isEmpty() == false) {
-            builder.field("meta", new TreeMap<>(fieldType().meta())); // ensure consistent order
+            builder.field(OpenSearchNames.META, new TreeMap<>(fieldType().meta())); // ensure consistent order
         }
     }
 

@@ -41,6 +41,7 @@ import org.apache.lucene.search.FieldExistsQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.common.CheckedConsumer;
 import org.opensearch.common.SetOnce;
 import org.opensearch.common.xcontent.XContentHelper;
@@ -229,7 +230,7 @@ public abstract class MapperTestCase extends MapperServiceTestCase {
         assumeTrue("Field doesn't support meta", supportsMeta());
         XContentBuilder mapping = fieldMapping(b -> {
             metaMapping(b);
-            b.field("meta", Collections.singletonMap("foo", "bar"));
+            b.field(OpenSearchNames.META, Collections.singletonMap("foo", "bar"));
         });
         MapperService mapperService = createMapperService(mapping);
         assertEquals(
@@ -246,7 +247,7 @@ public abstract class MapperTestCase extends MapperServiceTestCase {
 
         mapping = fieldMapping(b -> {
             metaMapping(b);
-            b.field("meta", Collections.singletonMap("baz", "quux"));
+            b.field(OpenSearchNames.META, Collections.singletonMap("baz", "quux"));
         });
         merge(mapperService, mapping);
         assertEquals(

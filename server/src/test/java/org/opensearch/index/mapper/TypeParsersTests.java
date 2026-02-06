@@ -41,7 +41,6 @@ import org.opensearch.index.analysis.AnalyzerScope;
 import org.opensearch.index.analysis.IndexAnalyzers;
 import org.opensearch.index.analysis.NamedAnalyzer;
 import org.opensearch.test.OpenSearchTestCase;
-import org.hamcrest.Matchers;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -126,7 +125,7 @@ public class TypeParsersTests extends OpenSearchTestCase {
             meta.put("foo5", "someValue");
             meta.put("foo6", "someValue");
             meta.put("foo7", "someValue");
-            Map<String,String> result = TypeParsers.parseMeta("foo", meta);
+            Map<String, String> result = TypeParsers.parseMeta("foo", meta);
             assertEquals(meta.size(), result.size());
         }
 
