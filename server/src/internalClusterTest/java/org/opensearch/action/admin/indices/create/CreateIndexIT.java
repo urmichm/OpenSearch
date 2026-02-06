@@ -32,6 +32,7 @@
 
 package org.opensearch.action.admin.indices.create;
 
+import org.opensearch.OpenSearchNames;
 import org.opensearch.action.UnavailableShardsException;
 import org.opensearch.action.admin.cluster.state.ClusterStateResponse;
 import org.opensearch.action.admin.indices.alias.Alias;
@@ -56,6 +57,7 @@ import org.opensearch.common.unit.TimeValue;
 import org.opensearch.common.xcontent.XContentFactory;
 import org.opensearch.core.action.ActionListener;
 import org.opensearch.core.common.bytes.BytesReference;
+import org.opensearch.core.xcontent.XContentBuilder;
 import org.opensearch.index.IndexNotFoundException;
 import org.opensearch.index.IndexService;
 import org.opensearch.index.IndexSettings;
@@ -80,6 +82,7 @@ import static org.opensearch.cluster.metadata.IndexMetadata.SETTING_WAIT_FOR_ACT
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertAcked;
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertBlocked;
 import static org.opensearch.test.hamcrest.OpenSearchAssertions.assertRequestBuilderThrows;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -197,6 +200,92 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         assertAcked(prepareCreate("test").setSettings(Settings.builder().put(IndexMetadata.SETTING_BLOCKS_METADATA, true)));
         assertBlocked(client().admin().indices().prepareGetSettings("test"), IndexMetadata.INDEX_METADATA_BLOCK);
         disableIndexBlock("test", IndexMetadata.SETTING_BLOCKS_METADATA);
+    }
+
+    public void testCreateIndexWithFieldLevelMeta() throws Exception {
+        XContentBuilder mapping = XContentFactory.jsonBuilder()
+            .startObject()
+            .startObject("properties")
+            .startObject("field1")
+            .field("type", "text")
+            .startObject(OpenSearchNames.DEPRECATED_META)
+            .field("unit", "milliseconds")
+            .field("metric_type", "counter")
+            .endObject()
+            .endObject()
+            .startObject("field2")
+            .field("type", "long")
+            .startObject(OpenSearchNames.META)
+            .field("description", "User count")
+            .field("format", "number")
+            .endObject()
+            .endObject()
+            .startObject("field3")
+            .field("type", "keyword")
+            // No meta block - testing mixed scenario
+            .endObject()
+            .endObject()
+            .endObject();
+
+        assertAcked(prepareCreate("test").setMapping(mapping));
+
+        GetMappingsResponse response = client().admin().indices().prepareGetMappings("test").get();
+        MappingMetadata metadata = response.mappings().get("test");
+        assertNotNull(metadata);
+
+        Map<String, Object> sourceAsMap = metadata.sourceAsMap();
+        Map<String, Object> properties = (Map<String, Object>) sourceAsMap.get("properties");
+
+        // Verify field1 meta
+        Map<String, Object> field1 = (Map<String, Object>) properties.get("field1");
+        Map<String, Object> field1Meta = (Map<String, Object>) field1.get(OpenSearchNames.META); // meta block on field level is stored
+                                                                                                 // under _meta
+        assertNotNull(field1Meta);
+        assertEquals("milliseconds", field1Meta.get("unit"));
+        assertEquals("counter", field1Meta.get("metric_type"));
+
+        // Verify field2 meta
+        Map<String, Object> field2 = (Map<String, Object>) properties.get("field2");
+        Map<String, Object> field2Meta = (Map<String, Object>) field2.get(OpenSearchNames.META); // meta block on field level is stored
+                                                                                                 // under _meta
+        assertNotNull(field2Meta);
+        assertEquals("User count", field2Meta.get("description"));
+        assertEquals("number", field2Meta.get("format"));
+
+        // Verify field3 has no meta
+        Map<String, Object> field3 = (Map<String, Object>) properties.get("field3");
+        assertNull(field3.get(OpenSearchNames.META));
+    }
+
+    public void testCreateIndexWithConflictingFieldLevelMeta() throws Exception {
+        try {
+            XContentBuilder mapping = XContentFactory.jsonBuilder()
+                .startObject()
+                .startObject("properties")
+                .startObject("field1")
+                .field("type", "text")
+                .startObject(OpenSearchNames.DEPRECATED_META)
+                .field("metric_type", "counter")
+                .endObject()
+                .startObject(OpenSearchNames.META)
+                .field("unit", "milliseconds")
+                .endObject()
+                .endObject()
+                .startObject("field2")
+                .field("type", "keyword")
+                // No meta block - testing mixed scenario
+                .endObject()
+                .endObject()
+                .endObject();
+
+            prepareCreate("test").setMapping(mapping).get();
+            fail("should have thrown an exception about the conflicting field level meta");
+        } catch (MapperParsingException e) {
+            assertThat(
+                e.getMessage(),
+                containsString("Cannot specify both [_meta] and [meta] for field [field1]. Use [_meta] as the canonical form.")
+            );
+        }
     }
 
     public void testUnknownSettingFails() {

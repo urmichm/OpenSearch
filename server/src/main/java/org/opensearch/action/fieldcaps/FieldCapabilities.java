@@ -32,6 +32,7 @@
 
 package org.opensearch.action.fieldcaps;
 
+import org.opensearch.OpenSearchNames;
 import org.opensearch.common.annotation.PublicApi;
 import org.opensearch.core.ParseField;
 import org.opensearch.core.common.Strings;
@@ -72,7 +73,7 @@ public class FieldCapabilities implements Writeable, ToXContentObject {
     private static final ParseField INDICES_FIELD = new ParseField("indices");
     private static final ParseField NON_SEARCHABLE_INDICES_FIELD = new ParseField("non_searchable_indices");
     private static final ParseField NON_AGGREGATABLE_INDICES_FIELD = new ParseField("non_aggregatable_indices");
-    private static final ParseField META_FIELD = new ParseField("meta");
+    private static final ParseField META_FIELD = new ParseField(OpenSearchNames.META);
 
     private final String name;
     private final String type;
@@ -158,7 +159,7 @@ public class FieldCapabilities implements Writeable, ToXContentObject {
             builder.field(NON_AGGREGATABLE_INDICES_FIELD.getPreferredName(), nonAggregatableIndices);
         }
         if (meta.isEmpty() == false) {
-            builder.startObject("meta");
+            builder.startObject(OpenSearchNames.META);
             List<Map.Entry<String, Set<String>>> entries = new ArrayList<>(meta.entrySet());
             entries.sort(Comparator.comparing(Map.Entry::getKey)); // provide predictable order
             for (Map.Entry<String, Set<String>> entry : entries) {

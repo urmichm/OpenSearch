@@ -70,6 +70,7 @@ import org.apache.lucene.tests.analysis.CannedTokenStream;
 import org.apache.lucene.tests.analysis.MockSynonymAnalyzer;
 import org.apache.lucene.tests.analysis.Token;
 import org.apache.lucene.util.BytesRef;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.Version;
 import org.opensearch.cluster.metadata.IndexMetadata;
 import org.opensearch.common.lucene.search.MultiPhrasePrefixQuery;
@@ -322,7 +323,7 @@ public class TextFieldMapperTests extends MapperTestCase {
                 b.field("max_chars", 10);
             }
             b.endObject();
-            b.startObject("meta");
+            b.startObject(OpenSearchNames.META);
             {
                 b.field("unit", "min");
             }
@@ -335,7 +336,7 @@ public class TextFieldMapperTests extends MapperTestCase {
         }));
         assertEquals(
             "{\"_doc\":{\"properties\":{\"field\":{\"type\":\"text\",\"store\":true,\"fields\":{\"subfield\":{\"type\":\"long\"}},"
-                + "\"copy_to\":[\"target\"],\"meta\":{\"unit\":\"min\"},\"index_options\":\"offsets\",\"term_vector\":\"yes\",\"norms\":false,"
+                + "\"copy_to\":[\"target\"],\"_meta\":{\"unit\":\"min\"},\"index_options\":\"offsets\",\"term_vector\":\"yes\",\"norms\":false,"
                 + "\"similarity\":\"BM25\",\"eager_global_ordinals\":true,\"position_increment_gap\":0,"
                 + "\"fielddata\":true,\"fielddata_frequency_filter\":{\"min\":0.001,\"max\":0.1,\"min_segment_size\":500},"
                 + "\"index_prefixes\":{\"min_chars\":1,\"max_chars\":10},\"index_phrases\":true}}}}",

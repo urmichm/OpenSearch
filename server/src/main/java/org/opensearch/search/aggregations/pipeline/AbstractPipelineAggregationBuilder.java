@@ -31,6 +31,7 @@
 
 package org.opensearch.search.aggregations.pipeline;
 
+import org.opensearch.OpenSearchNames;
 import org.opensearch.core.ParseField;
 import org.opensearch.core.common.io.stream.StreamInput;
 import org.opensearch.core.common.io.stream.StreamOutput;
@@ -113,7 +114,7 @@ public abstract class AbstractPipelineAggregationBuilder<PAB extends AbstractPip
         builder.startObject(getName());
 
         if (this.metadata != null) {
-            builder.field("meta", this.metadata);
+            builder.field(OpenSearchNames.META, this.metadata);
         }
         builder.startObject(type);
 

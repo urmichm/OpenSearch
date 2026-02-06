@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Add security policy to allow `accessUnixDomainSocket` in `transport-grpc` module ([#20463](https://github.com/opensearch-project/OpenSearch/pull/20463))
 
 ### Changed
+- Add support for field-level `_meta` in mappings; `meta` is deprecated as an alias; field metadata validation was relaxed ([#19884](https://github.com/opensearch-project/OpenSearch/issues/19884))
 
 ### Fixed
 - Fix flaky test failures in ShardsLimitAllocationDeciderIT ([#20375](https://github.com/opensearch-project/OpenSearch/pull/20375))

@@ -33,6 +33,7 @@
 package org.opensearch.index.mapper;
 
 import org.apache.lucene.index.IndexOptions;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.OpenSearchParseException;
 import org.opensearch.common.logging.DeprecationLogger;
 import org.opensearch.common.time.DateFormatter;
@@ -81,34 +82,17 @@ public class TypeParsers {
     public static Map<String, String> parseMeta(String name, Object metaObject) {
         if (metaObject instanceof Map == false) {
             throw new MapperParsingException(
-                "[meta] must be an object, got " + metaObject.getClass().getSimpleName() + "[" + metaObject + "] for field [" + name + "]"
+                "[_meta] must be an object, got " + metaObject.getClass().getSimpleName() + "[" + metaObject + "] for field [" + name + "]"
             );
         }
         @SuppressWarnings("unchecked")
         Map<String, ?> meta = (Map<String, ?>) metaObject;
-        if (meta.size() > 5) {
-            throw new MapperParsingException("[meta] can't have more than 5 entries, but got " + meta.size() + " on field [" + name + "]");
-        }
-        for (String key : meta.keySet()) {
-            if (key.codePointCount(0, key.length()) > 20) {
-                throw new MapperParsingException(
-                    "[meta] keys can't be longer than 20 chars, but got [" + key + "] for field [" + name + "]"
-                );
-            }
-        }
         for (Object value : meta.values()) {
-            if (value instanceof String) {
-                String sValue = (String) value;
-                if (sValue.codePointCount(0, sValue.length()) > 50) {
-                    throw new MapperParsingException(
-                        "[meta] values can't be longer than 50 chars, but got [" + value + "] for field [" + name + "]"
-                    );
-                }
-            } else if (value == null) {
-                throw new MapperParsingException("[meta] values can't be null (field [" + name + "])");
-            } else {
+            if (value == null) {
+                throw new MapperParsingException("[_meta] values can't be null (field [" + name + "])");
+            } else if (!(value instanceof String)) {
                 throw new MapperParsingException(
-                    "[meta] values can only be strings, but got "
+                    "[_meta] values can only be strings, but got "
                         + value.getClass().getSimpleName()
                         + "["
                         + value
@@ -134,6 +118,11 @@ public class TypeParsers {
         Map<String, Object> fieldNode,
         Mapper.TypeParser.ParserContext parserContext
     ) {
+        if (fieldNode.containsKey(OpenSearchNames.META) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META)) {
+            throw new MapperParsingException(
+                "Cannot specify both [_meta] and [meta] for field [" + name + "]. Use [_meta] as the canonical form."
+            );
+        }
         for (Iterator<Map.Entry<String, Object>> iterator = fieldNode.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry<String, Object> entry = iterator.next();
             final String propName = entry.getKey();
@@ -142,9 +131,20 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals("meta")) {
+            } else if (propName.equals(OpenSearchNames.META) || propName.equals(OpenSearchNames.DEPRECATED_META)) {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
+                if (propName.equals(OpenSearchNames.DEPRECATED_META)) {
+                    deprecationLogger.deprecate(
+                        OpenSearchNames.DEPRECATED_META,
+                        "Parameter ["
+                            + OpenSearchNames.DEPRECATED_META
+                            + "] on field [{}] is deprecated, use ["
+                            + OpenSearchNames.META
+                            + "] instead",
+                        name
+                    );
+                }
             } else if (propName.equals("index")) {
                 builder.index(XContentMapValues.nodeBooleanValue(propNode, name + ".index"));
                 iterator.remove();

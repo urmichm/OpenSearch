@@ -33,6 +33,7 @@
 package org.opensearch.index.mapper;
 
 import org.apache.lucene.document.FieldType;
+import org.opensearch.OpenSearchNames;
 import org.opensearch.Version;
 import org.opensearch.common.Explicit;
 import org.opensearch.common.TriFunction;
@@ -525,16 +526,20 @@ public abstract class ParametrizedFieldMapper extends FieldMapper {
         }
 
         /**
-         * Declares a metadata parameter
+         * Declares a metadata parameter.
+         * Accepts both "meta" and "_meta" keys for backward compatibility.
+         * Note: "_meta" is the preferred form to align with mapping-level _meta.
          */
         public static Parameter<Map<String, String>> metaParam() {
-            return new Parameter<>(
-                "meta",
+            Parameter<Map<String, String>> metaParam = new Parameter<>(
+                OpenSearchNames.META,
                 true,
                 Collections::emptyMap,
                 (n, c, o) -> TypeParsers.parseMeta(n, o),
                 m -> m.fieldType().meta()
             );
+            metaParam.addDeprecatedName(OpenSearchNames.DEPRECATED_META);
+            return metaParam;
         }
 
         public static Parameter<Boolean> indexParam(Function<FieldMapper, Boolean> initializer, boolean defaultValue) {
@@ -664,6 +669,11 @@ public abstract class ParametrizedFieldMapper extends FieldMapper {
         public final void parse(String name, ParserContext parserContext, Map<String, Object> fieldNode) {
             Map<String, Parameter<?>> paramsMap = new HashMap<>();
             Map<String, Parameter<?>> deprecatedParamsMap = new HashMap<>();
+            if (fieldNode.containsKey(OpenSearchNames.META) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META)) {
+                throw new MapperParsingException(
+                    "Cannot specify both [_meta] and [meta] for field [" + name + "]. " + "Use [_meta] as the canonical form."
+                );
+            }
             for (Parameter<?> param : getParameters()) {
                 paramsMap.put(param.name, param);
                 for (String deprecatedName : param.deprecatedNames) {
