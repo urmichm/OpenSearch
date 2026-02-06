@@ -169,7 +169,7 @@ public abstract class AbstractAggregationBuilder<AB extends AbstractAggregationB
         builder.startObject(name);
 
         if (this.metadata != null) {
-            builder.field(OpenSearchNames.META_NAME, this.metadata);
+            builder.field(OpenSearchNames.META, this.metadata);
         }
         builder.field(getType());
         internalXContent(builder, params);

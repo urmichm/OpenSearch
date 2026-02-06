@@ -5,6 +5,6 @@ public class OpenSearchNames {
         // no ctor:
     }
 
-    public static final String META_NAME = "_meta";
-    public static final String DEPRECATED_META_NAME = "meta";
+    public static final String META = "_meta";
+    public static final String DEPRECATED_META = "meta";
 }

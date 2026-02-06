@@ -118,7 +118,7 @@ public class TypeParsers {
         Map<String, Object> fieldNode,
         Mapper.TypeParser.ParserContext parserContext
     ) {
-        if (fieldNode.containsKey(OpenSearchNames.META_NAME) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META_NAME)) {
+        if (fieldNode.containsKey(OpenSearchNames.META) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META)) {
             throw new MapperParsingException(
                 "Cannot specify both [_meta] and [meta] for field [" + name + "]. Use [_meta] as the canonical form."
             );
@@ -131,16 +131,16 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals(OpenSearchNames.META_NAME) || propName.equals(OpenSearchNames.DEPRECATED_META_NAME)) {
+            } else if (propName.equals(OpenSearchNames.META) || propName.equals(OpenSearchNames.DEPRECATED_META)) {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
-                if (propName.equals(OpenSearchNames.DEPRECATED_META_NAME)) {
+                if (propName.equals(OpenSearchNames.DEPRECATED_META)) {
                     deprecationLogger.deprecate(
-                        OpenSearchNames.DEPRECATED_META_NAME,
+                        OpenSearchNames.DEPRECATED_META,
                         "Parameter ["
-                            + OpenSearchNames.DEPRECATED_META_NAME
+                            + OpenSearchNames.DEPRECATED_META
                             + "] on field [{}] is deprecated, use ["
-                            + OpenSearchNames.META_NAME
+                            + OpenSearchNames.META
                             + "] instead",
                         name
                     );

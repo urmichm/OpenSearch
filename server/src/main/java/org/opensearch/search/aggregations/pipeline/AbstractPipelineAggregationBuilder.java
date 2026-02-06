@@ -114,7 +114,7 @@ public abstract class AbstractPipelineAggregationBuilder<PAB extends AbstractPip
         builder.startObject(getName());
 
         if (this.metadata != null) {
-            builder.field(OpenSearchNames.META_NAME, this.metadata);
+            builder.field(OpenSearchNames.META, this.metadata);
         }
         builder.startObject(type);
 

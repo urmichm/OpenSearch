@@ -532,13 +532,13 @@ public abstract class ParametrizedFieldMapper extends FieldMapper {
          */
         public static Parameter<Map<String, String>> metaParam() {
             Parameter<Map<String, String>> metaParam = new Parameter<>(
-                OpenSearchNames.META_NAME,
+                OpenSearchNames.META,
                 true,
                 Collections::emptyMap,
                 (n, c, o) -> TypeParsers.parseMeta(n, o),
                 m -> m.fieldType().meta()
             );
-            metaParam.addDeprecatedName(OpenSearchNames.DEPRECATED_META_NAME);
+            metaParam.addDeprecatedName(OpenSearchNames.DEPRECATED_META);
             return metaParam;
         }
 
@@ -669,7 +669,7 @@ public abstract class ParametrizedFieldMapper extends FieldMapper {
         public final void parse(String name, ParserContext parserContext, Map<String, Object> fieldNode) {
             Map<String, Parameter<?>> paramsMap = new HashMap<>();
             Map<String, Parameter<?>> deprecatedParamsMap = new HashMap<>();
-            if (fieldNode.containsKey(OpenSearchNames.META_NAME) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META_NAME)) {
+            if (fieldNode.containsKey(OpenSearchNames.META) && fieldNode.containsKey(OpenSearchNames.DEPRECATED_META)) {
                 throw new MapperParsingException(
                     "Cannot specify both [_meta] and [meta] for field [" + name + "]. " + "Use [_meta] as the canonical form."
                 );

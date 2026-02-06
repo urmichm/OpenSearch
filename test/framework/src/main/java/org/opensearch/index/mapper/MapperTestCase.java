@@ -230,7 +230,7 @@ public abstract class MapperTestCase extends MapperServiceTestCase {
         assumeTrue("Field doesn't support meta", supportsMeta());
         XContentBuilder mapping = fieldMapping(b -> {
             metaMapping(b);
-            b.field(OpenSearchNames.META_NAME, Collections.singletonMap("foo", "bar"));
+            b.field(OpenSearchNames.META, Collections.singletonMap("foo", "bar"));
         });
         MapperService mapperService = createMapperService(mapping);
         assertEquals(
@@ -247,7 +247,7 @@ public abstract class MapperTestCase extends MapperServiceTestCase {
 
         mapping = fieldMapping(b -> {
             metaMapping(b);
-            b.field(OpenSearchNames.META_NAME, Collections.singletonMap("baz", "quux"));
+            b.field(OpenSearchNames.META, Collections.singletonMap("baz", "quux"));
         });
         merge(mapperService, mapping);
         assertEquals(

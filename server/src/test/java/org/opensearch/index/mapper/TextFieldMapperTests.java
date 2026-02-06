@@ -323,7 +323,7 @@ public class TextFieldMapperTests extends MapperTestCase {
                 b.field("max_chars", 10);
             }
             b.endObject();
-            b.startObject(OpenSearchNames.META_NAME);
+            b.startObject(OpenSearchNames.META);
             {
                 b.field("unit", "min");
             }

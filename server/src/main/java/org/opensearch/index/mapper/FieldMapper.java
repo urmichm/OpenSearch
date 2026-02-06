@@ -568,7 +568,7 @@ public abstract class FieldMapper extends Mapper implements Cloneable {
         copyTo.toXContent(builder, params);
 
         if (includeDefaults || fieldType().meta().isEmpty() == false) {
-            builder.field(OpenSearchNames.META_NAME, new TreeMap<>(fieldType().meta())); // ensure consistent order
+            builder.field(OpenSearchNames.META, new TreeMap<>(fieldType().meta())); // ensure consistent order
         }
     }
 

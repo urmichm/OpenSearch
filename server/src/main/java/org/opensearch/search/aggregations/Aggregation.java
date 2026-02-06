@@ -74,7 +74,7 @@ public interface Aggregation extends ToXContentFragment {
      * Common xcontent fields that are shared among addAggregation
      */
     final class CommonFields extends ParseField.CommonFields {
-        public static final ParseField META = new ParseField(OpenSearchNames.META_NAME);
+        public static final ParseField META = new ParseField(OpenSearchNames.META);
         public static final ParseField BUCKETS = new ParseField("buckets");
         public static final ParseField VALUE = new ParseField("value");
         public static final ParseField VALUES = new ParseField("values");

@@ -166,7 +166,7 @@ public class AggregatorFactories {
                 token = parser.nextToken();
                 if (token == XContentParser.Token.START_OBJECT) {
                     switch (fieldName) {
-                        case OpenSearchNames.META_NAME:
+                        case OpenSearchNames.META:
                             metadata = parser.map();
                             break;
                         case "aggregations":
