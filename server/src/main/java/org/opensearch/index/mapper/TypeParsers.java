@@ -119,6 +119,11 @@ public class TypeParsers {
         Map<String, Object> fieldNode,
         Mapper.TypeParser.ParserContext parserContext
     ) {
+        if (fieldNode.containsKey("meta") && fieldNode.containsKey("_meta")) {
+            throw new MapperParsingException(
+                "Cannot specify both [_meta] and [meta] for field [" + name + "]. Use [_meta] as the canonical form."
+            );
+        }
         for (Iterator<Map.Entry<String, Object>> iterator = fieldNode.entrySet().iterator(); iterator.hasNext();) {
             Map.Entry<String, Object> entry = iterator.next();
             final String propName = entry.getKey();
@@ -127,7 +132,7 @@ public class TypeParsers {
             if (propName.equals("store")) {
                 builder.store(XContentMapValues.nodeBooleanValue(propNode, name + ".store"));
                 iterator.remove();
-            } else if (propName.equals("_meta") || propName.equals("meta")) { // LBL
+            } else if (propName.equals("_meta") || propName.equals("meta")) {
                 builder.meta(parseMeta(name, propNode));
                 iterator.remove();
                 if (propName.equals("meta")) {
