@@ -239,7 +239,7 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         // Verify field1 meta
         Map<String, Object> field1 = (Map<String, Object>) properties.get("field1");
         Map<String, Object> field1Meta = (Map<String, Object>) field1.get(OpenSearchNames.META); // meta block on field level is stored
-                                                                                                      // under _meta
+                                                                                                 // under _meta
         assertNotNull(field1Meta);
         assertEquals("milliseconds", field1Meta.get("unit"));
         assertEquals("counter", field1Meta.get("metric_type"));
@@ -247,7 +247,7 @@ public class CreateIndexIT extends OpenSearchIntegTestCase {
         // Verify field2 meta
         Map<String, Object> field2 = (Map<String, Object>) properties.get("field2");
         Map<String, Object> field2Meta = (Map<String, Object>) field2.get(OpenSearchNames.META); // meta block on field level is stored
-                                                                                                      // under _meta
+                                                                                                 // under _meta
         assertNotNull(field2Meta);
         assertEquals("User count", field2Meta.get("description"));
         assertEquals("number", field2Meta.get("format"));
