@@ -182,7 +182,7 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
         // MUST never reach here
     }
 
-    private static FetchSourceContext parseSourceObject(XContentParser parser) throws IOException {
+    public static FetchSourceContext parseSourceObject(XContentParser parser) throws IOException {
         XContentParser.Token token = parser.currentToken();
         Set<String> includes = Collections.emptySet();
         Set<String> excludes = Collections.emptySet();
@@ -191,6 +191,13 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
             if (token == XContentParser.Token.FIELD_NAME) {
                 currentFieldName = parser.currentName();
                 continue; // only field name is required in this iteration
+            }
+            if (currentFieldName == null) {
+                throw new ParsingException(
+                    parser.getTokenLocation(),
+                    "Expected a field name but got a " + token + " in [" + parser.currentName() + "].",
+                    parser.getTokenLocation()
+                );
             }
             // process field value
             switch (token) {
@@ -240,6 +247,14 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
                     );
                 }
             }
+        }
+        if (currentFieldName == null) {
+            // no field names -> empty object; empty object is not allowed
+            throw new ParsingException(
+                parser.getTokenLocation(),
+                "Expected at least one of [" + INCLUDES_FIELD.getPreferredName() + "] or [" + EXCLUDES_FIELD.getPreferredName() + "]",
+                parser.getTokenLocation()
+            );
         }
         return new FetchSourceContext(true, includes.toArray(new String[0]), excludes.toArray(new String[0]));
     }
