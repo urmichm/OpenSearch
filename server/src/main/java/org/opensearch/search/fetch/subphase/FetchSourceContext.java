@@ -188,8 +188,7 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
                         + XContentParser.Token.START_OBJECT
                         + "] but found ["
                         + token
-                        + "]",
-                    parser.getTokenLocation()
+                        + "]"
                 );
             }
         }
@@ -215,8 +214,7 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
             if (currentFieldName == null) {
                 throw new ParsingException(
                     parser.getTokenLocation(),
-                    "Expected a field name but got a " + token + " in [" + parser.currentName() + "].",
-                    parser.getTokenLocation()
+                    "Expected a field name but got a " + token + " in [" + parser.currentName() + "]."
                 );
             }
             // process field value
@@ -224,15 +222,12 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
                 case XContentParser.Token.START_ARRAY -> {
                     if (INCLUDES_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
                         includes = parseSourceArray(parser, INCLUDES_FIELD, excludes);
-                    }
-                    else if (EXCLUDES_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (EXCLUDES_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
                         excludes = parseSourceArray(parser, EXCLUDES_FIELD, includes);
-                    }
-                    else {
+                    } else {
                         throw new ParsingException(
                             parser.getTokenLocation(),
-                            "Unknown key for a " + token + " in [" + currentFieldName + "].",
-                            parser.getTokenLocation()
+                            "Unknown key for a " + token + " in [" + currentFieldName + "]."
                         );
                     }
                 }
@@ -243,27 +238,23 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
                             throw new OpenSearchException(AMBIGUOUS_FIELD_MESSAGE, includeEntry);
                         }
                         includes = Collections.singleton(includeEntry);
-                    }
-                    else if (EXCLUDES_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
+                    } else if (EXCLUDES_FIELD.match(currentFieldName, parser.getDeprecationHandler())) {
                         String excludeEntry = parser.text();
                         if (includes.contains(excludeEntry)) {
                             throw new OpenSearchException(AMBIGUOUS_FIELD_MESSAGE, excludeEntry);
                         }
                         excludes = Collections.singleton(excludeEntry);
-                    }
-                    else {
+                    } else {
                         throw new ParsingException(
                             parser.getTokenLocation(),
-                            "Unknown key for a " + token + " in [" + currentFieldName + "].",
-                            parser.getTokenLocation()
+                            "Unknown key for a " + token + " in [" + currentFieldName + "]."
                         );
                     }
                 }
                 default -> {
                     throw new ParsingException(
                         parser.getTokenLocation(),
-                        "Unknown key for a " + token + " in [" + currentFieldName + "].",
-                        parser.getTokenLocation()
+                        "Unknown key for a " + token + " in [" + currentFieldName + "]."
                     );
                 }
             }
@@ -272,8 +263,7 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
             // no field names -> empty object; empty object is not allowed
             throw new ParsingException(
                 parser.getTokenLocation(),
-                "Expected at least one of [" + INCLUDES_FIELD.getPreferredName() + "] or [" + EXCLUDES_FIELD.getPreferredName() + "]",
-                parser.getTokenLocation()
+                "Expected at least one of [" + INCLUDES_FIELD.getPreferredName() + "] or [" + EXCLUDES_FIELD.getPreferredName() + "]"
             );
         }
         return new FetchSourceContext(true, includes.toArray(new String[0]), excludes.toArray(new String[0]));
@@ -288,20 +278,17 @@ public class FetchSourceContext implements Writeable, ToXContentObject {
                     throw new OpenSearchException(AMBIGUOUS_FIELD_MESSAGE, entry);
                 }
                 sourceArr.add(entry);
-            }
-            else {
+            } else {
                 throw new ParsingException(
                     parser.getTokenLocation(),
-                    "Unknown key for a " + parser.currentToken() + " in [" + parser.currentName() + "].",
-                    parser.getTokenLocation()
+                    "Unknown key for a " + parser.currentToken() + " in [" + parser.currentName() + "]."
                 );
             }
         }
         if (sourceArr.isEmpty()) {
             throw new ParsingException(
                 parser.getTokenLocation(),
-                "Expected at least one value for an array of [" + parseField.getPreferredName() + "]",
-                parser.getTokenLocation()
+                "Expected at least one value for an array of [" + parseField.getPreferredName() + "]"
             );
         }
         return sourceArr;
