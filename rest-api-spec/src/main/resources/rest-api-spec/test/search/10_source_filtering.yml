@@ -44,6 +44,20 @@ setup:
   - match: { error.reason: "Expected at least one of [includes] or [excludes]" }
 
 ---
+"_source ambiguous field":
+  - do:
+      search:
+        body:
+          _source:
+            includes: [ include.field1, include.field2 ]
+            excludes: [ include.field1 ]
+          query: { match_all: {} }
+      catch: bad_request
+  - match: { status: 400 }
+  - match: { error.type: parsing_exception }
+  - match: { error.reason: "The same entry [include.field1] cannot be both included and excluded in _source." }
+
+---
 "no filtering":
   - do: { search: { body: { query: { match_all: {} } } } }
   - length:   { hits.hits: 1  }
