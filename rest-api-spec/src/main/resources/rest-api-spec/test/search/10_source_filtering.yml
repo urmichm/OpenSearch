@@ -36,6 +36,9 @@ setup:
 
 ---
 "_source as an empty object":
+  - skip:
+      version: " - 3.5.0"
+      reason: "validation was added later"
   - do:
       search: { body: { _source: {  }, query: { match_all: {} } } }
       catch: bad_request
@@ -45,6 +48,9 @@ setup:
 
 ---
 "_source as an empty includes array":
+  - skip:
+      version: " - 3.5.0"
+      reason: "validation was added later"
   - do:
       search: { body: { _source: [], query: { match_all: {} } } }
       catch: bad_request
@@ -54,6 +60,9 @@ setup:
 
 ---
 "_source with an empty excludes array":
+  - skip:
+      version: " - 3.5.0"
+      reason: "validation was added later"
   - do:
       search:
         body:
@@ -68,6 +77,9 @@ setup:
 
 ---
 "_source with an ambiguous field":
+  - skip:
+      version: " - 3.5.0"
+      reason: "validation was added later"
   - do:
       search:
         body:
