@@ -35,7 +35,7 @@ setup:
   - is_false: hits.hits.0._source
 
 ---
-"_source empty object":
+"_source as an empty object":
   - do:
       search: { body: { _source: {  }, query: { match_all: {} } } }
       catch: bad_request
@@ -44,7 +44,30 @@ setup:
   - match: { error.reason: "Expected at least one of [includes] or [excludes]" }
 
 ---
-"_source ambiguous field":
+"_source as an empty includes array":
+  - do:
+      search: { body: { _source: [], query: { match_all: {} } } }
+      catch: bad_request
+  - match: { status: 400 }
+  - match: { error.type: parsing_exception }
+  - match: { error.reason: "Expected at least one value for an array of [includes]" }
+
+---
+"_source with an empty excludes array":
+  - do:
+      search:
+        body:
+          _source:
+            includes: [ include.field1, include.field2 ]
+            excludes: []
+          query: { match_all: {} }
+      catch: bad_request
+  - match: { status: 400 }
+  - match: { error.type: parsing_exception }
+  - match: { error.reason: "Expected at least one value for an array of [excludes]" }
+
+---
+"_source with an ambiguous field":
   - do:
       search:
         body:
