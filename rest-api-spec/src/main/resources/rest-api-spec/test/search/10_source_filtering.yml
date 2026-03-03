@@ -35,6 +35,15 @@ setup:
   - is_false: hits.hits.0._source
 
 ---
+"_source empty object":
+  - do:
+      search: { body: { _source: {  }, query: { match_all: {} } } }
+      catch: bad_request
+  - match: { status: 400 }
+  - match: { error.type: parsing_exception }
+  - match: { error.reason: "Expected at least one of [includes] or [excludes]" }
+
+---
 "no filtering":
   - do: { search: { body: { query: { match_all: {} } } } }
   - length:   { hits.hits: 1  }
