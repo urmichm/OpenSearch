@@ -42,7 +42,6 @@ import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.TooComplexToDeterminizeException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -178,18 +177,16 @@ public class AutomatonQueries {
     }
 
     public static Automaton toCaseInsensitiveChar(int codepoint) { // this
-        Automaton case1 = Automata.makeChar(codepoint);
-        // For now we only work with ASCII characters
-        if (codepoint > 128) {
-            return case1;
+        List<Automaton> cases = new ArrayList<>();
+        cases.add(Automata.makeChar(codepoint));
+        int lowerCase = Character.toLowerCase(codepoint);
+        if (lowerCase != codepoint) {
+            cases.add(Automata.makeChar(lowerCase));
         }
-        int altCase = Character.isLowerCase(codepoint) ? Character.toUpperCase(codepoint) : Character.toLowerCase(codepoint);
-        Automaton result;
-        if (altCase != codepoint) {
-            result = Operations.union(Arrays.asList(case1, Automata.makeChar(altCase)));
-        } else {
-            result = case1;
+        int upperCase = Character.toUpperCase(codepoint);
+        if (upperCase != codepoint) {
+            cases.add(Automata.makeChar(upperCase));
         }
-        return result;
+        return Operations.union(cases);
     }
 }
