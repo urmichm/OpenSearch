@@ -177,7 +177,7 @@ public class AutomatonQueries {
         return Operations.concatenate(list);
     }
 
-    public static Automaton toCaseInsensitiveChar(int codepoint) {
+    public static Automaton toCaseInsensitiveChar(int codepoint) { // this
         Automaton case1 = Automata.makeChar(codepoint);
         // For now we only work with ASCII characters
         if (codepoint > 128) {
