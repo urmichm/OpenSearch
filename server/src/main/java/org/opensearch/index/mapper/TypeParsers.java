@@ -82,6 +82,7 @@ public class TypeParsers {
      * Parse the {@code meta} key of the mapping.
      */
     public static Map<String, String> parseMeta(String name, Object metaObject) {
+        /// 22368
         if (metaObject instanceof Map == false) {
             throw new MapperParsingException(
                 "[meta] must be an object, got " + metaObject.getClass().getSimpleName() + "[" + metaObject + "] for field [" + name + "]"
@@ -106,6 +107,7 @@ public class TypeParsers {
             if (value == null) {
                 throw new MapperParsingException("[meta] values can't be null (field [" + name + "])");
             }
+            /// 22368
             if (value instanceof String sValue) {
                 if (sValue.codePointCount(0, sValue.length()) > META_MAX_VALUE_LENGTH) {
                     throw new MapperParsingException(
